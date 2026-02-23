@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Bem-vindo ao Portal{% endblock %}
+
+{% block content %}
+
+<div class="row align-items-center py-5 mt-4">
+    <div class="col-lg-6 order-2 order-lg-1">
+        <div class="pe-lg-5">
+            <span class="badge bg-primary bg-opacity-10 text-primary mb-3 px-3 py-2 rounded-pill fw-bold">
+                <i class="bi bi-stars me-1"></i> Renovação Online 2026
+            </span>
+            <h1 class="display-4 fw-bold lh-1 mb-4 text-dark">
+                A tua autorização de residência, <span class="text-primary">renovada em minutos.</span>
+            </h1>
+            <p class="lead text-muted mb-5">
+                Acabe com as filas e a burocracia. O <strong>ImigraÁgil</strong> permite-lhe submeter documentos, acompanhar o estado do processo e agendar a recolha do cartão, tudo a partir de casa.
+            </p>
+            
+            <div class="d-grid gap-3 d-md-flex justify-content-md-start">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm rounded-pill">
+                        Ir para o Dashboard <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                {% else %}
+                    <a href="{% url 'signup' %}" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm rounded-pill">
+                        Criar Conta
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">
+                        Já tenho conta
+                    </a>
+                {% endif %}
+            </div>
+            
+            <div class="mt-4 pt-2 d-flex align-items-center text-muted small">
+                <i class="bi bi-shield-check fs-4 text-success me-2"></i>
+                <span>Dados processados com segurança.</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 order-1 order-lg-2 text-center mb-5 mb-lg-0">
+        <div class="position-relative d-inline-block">
+            <div class="position-absolute top-50 start-50 translate-middle bg-primary bg-opacity-10 rounded-circle" style="width: 300px; height: 300px; z-index: -1;"></div>
+            <i class="bi bi-passport text-primary" style="font-size: 12rem; opacity: 0.9;"></i>
+        </div>
+    </div>
+</div>
+
+<div class="py-5 mt-5 border-top">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Como funciona?</h2>
+        <p class="text-muted">Três passos simples para regularizar a sua situação.</p>
+    </div>
+
+    <div class="row g-4 row-cols-1 row-cols-md-3">
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm bg-light text-center p-4">
+                <div class="icon-square bg-white text-primary d-inline-flex align-items-center justify-content-center fs-2 rounded-circle shadow-sm mb-3 mx-auto" style="width: 70px; height: 70px;">
+                    <i class="bi bi-cloud-upload"></i>
+                </div>
+                <h4 class="fw-bold">Processo todo digital</h4>
+                <p class="text-muted">Crie a sua conta e carregue os documentos digitalizados (Passaporte, Registo Criminal, etc) na nossa plataforma segura.</p>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm bg-light text-center p-4">
+                <div class="icon-square bg-white text-primary d-inline-flex align-items-center justify-content-center fs-2 rounded-circle shadow-sm mb-3 mx-auto" style="width: 70px; height: 70px;">
+                    <i class="bi bi-search"></i> </div>
+                <h4 class="fw-bold">Análise Transparente</h4>
+                <p class="text-muted">Acompanhe cada etapa. Receba notificações quando o seu processo for analisado pelos nossos técnicos.</p>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm bg-light text-center p-4">
+                <div class="icon-square bg-white text-primary d-inline-flex align-items-center justify-content-center fs-2 rounded-circle shadow-sm mb-3 mx-auto" style="width: 70px; height: 70px;">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <h4 class="fw-bold">Agendamento</h4>
+                <p class="text-muted">Após aprovação, gere a sua senha digital e escolha a data para levantar o seu cartão na loja AIMA mais próxima.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not user.is_authenticated %}
+<div class="bg-primary text-white rounded-4 p-5 text-center mt-5 mb-5 shadow">
+    <h2 class="fw-bold mb-3">Pronto para começar?</h2>
+    <p class="lead mb-4 opacity-75">Junte-se a milhares de cidadãos que já renovaram online.</p>
+    <a href="{% url 'signup' %}" class="btn btn-light fw-bold btn-sm rounded-pill px-3" 
+       style="color: #0d6efd !important;" >
+        Criar Conta Agora
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

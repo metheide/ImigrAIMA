@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - ImigraÁgil{% endblock %}
+
+{% block content %}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5">
+    <div class="mb-3 mb-md-0">
+        <h1 class="fw-bold text-dark">Olá, {{ user.first_name|default:user.username }}!</h1>
+        <p class="text-muted mb-0">Bem-vindo ao teu portal de imigração.</p>
+    </div>
+    
+    <div class="d-flex gap-2">
+        
+        {% if user.is_staff %}
+            <a href="{% url 'manager_dashboard' %}" class="btn btn-warning text-dark shadow-sm">
+                <i class="bi bi-bar-chart-fill"></i> Gestão
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 overflow-hidden">
+    
+    <div class="card-header bg-white py-3 border-bottom">
+        <div class="row align-items-center gy-2">
+            
+            <div class="col-md-4">
+                <h5 class="mb-0 fw-bold text-primary">
+                    <i class="bi bi-folder2-open me-2"></i>Meus Processos
+                </h5>
+            </div>
+
+            <div class="col-md-8 d-flex justify-content-md-end gap-2">
+                <form method="get" action="{% url 'dashboard' %}" class="d-flex flex-grow-1 flex-md-grow-0" style="max-width: 300px;">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                        <input class="form-control border-start-0 ps-0 bg-light" type="search" name="q" placeholder="Pesquisar ID ou Serviço..." value="{{ request.GET.q|default:'' }}">
+                    </div>
+                </form>
+
+                {% if pode_criar_novo %}
+                    <a href="{% url 'create_process' %}" class="btn btn-sm btn-success fw-bold d-flex align-items-center shadow-sm text-nowrap">
+                        <i class="bi bi-plus-circle-fill me-2"></i> Novo Pedido
+                    </a>
+                {% else %}
+                    <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Tens processos pendentes. Finaliza-os antes de criar um novo.">
+                        <button class="btn btn-sm btn-secondary fw-bold d-flex align-items-center shadow-sm text-nowrap" disabled>
+                            <i class="bi bi-lock-fill me-2"></i> Novo Pedido
+                        </button>
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        {% if processos %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light border-bottom">
+                        <tr>
+                            <th class="ps-4 text-secondary text-uppercase small fw-bold" style="width: 22%;">ID Processo</th>
+                            <th class="text-secondary text-uppercase small fw-bold" style="width: 28%;">Serviço</th>
+                            <th class="text-secondary text-uppercase small fw-bold" style="width: 15%;">Data</th>
+                            <th class="text-secondary text-uppercase small fw-bold" style="width: 15%;">Estado</th>
+                            <th class="text-secondary text-uppercase small fw-bold text-end pe-4" style="width: 20%;">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in processos %}
+                        <tr>
+                            <td class="ps-4">
+                                <span class="font-monospace fw-bold text-primary bg-primary bg-opacity-10 px-2 py-1 rounded small">
+                                    PT/{{ p.submission_date|date:"Y" }}/{{ p.id|stringformat:"04d" }}
+                                </span>
+                            </td>
+                            
+                            <td class="fw-semibold text-dark">{{ p.service_type.name }}</td>
+                            
+                            <td class="text-muted small text-nowrap">
+                                <i class="bi bi-calendar3 me-1"></i> {{ p.submission_date|date:"d M Y" }}
+                            </td>
+                            
+                            <td>
+                                {% if p.status == 'approved' %}
+                                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3">
+                                        <i class="bi bi-check-circle-fill me-1"></i>Aprovado
+                                    </span>
+                                {% elif p.status == 'rejected' %}
+                                    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3">
+                                        <i class="bi bi-x-circle-fill me-1"></i>Rejeitado
+                                    </span>
+                                {% elif p.status == 'submitted' %}
+                                    <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3">
+                                        <i class="bi bi-send-fill me-1"></i>Submetido
+                                    </span>
+                                {% elif p.status == 'review' %}
+                                    <span class="badge rounded-pill bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3">
+                                        <i class="bi bi-eye-fill me-1"></i>Em Análise
+                                    </span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 text-dark px-3">
+                                        <i class="bi bi-pencil-fill me-1"></i>Rascunho
+                                    </span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="text-end pe-4 text-nowrap">
+                                <div class="d-inline-flex align-items-center gap-1">
+                                    
+                                    <a href="{% url 'process_detail' p.id %}" class="btn btn-sm btn-outline-secondary" title="Ver Detalhes">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                    
+                                    {% if p.appointment %}
+                                        <button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#ticketModal{{ p.id }}" 
+                                                title="Ver Senha Digital">
+                                            <i class="bi bi-ticket-perforated"></i>
+                                            <span class="fw-semibold d-none d-xl-inline">Senha</span>
+                                        </button>
+
+                                    {% elif p.status == 'approved' %}
+                                        <a href="{% url 'generate_appointment' p.id %}" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1" title="Agendar Recolha">
+                                            <i class="bi bi-calendar-check"></i>
+                                            <span class="d-none d-xl-inline ms-1">Agendar</span>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+            <div class="text-center py-5">
+                <div class="mb-3 text-muted opacity-50">
+                    <i class="bi bi-folder-plus" style="font-size: 4rem;"></i>
+                </div>
+                <h5 class="fw-bold text-muted">Ainda não tens processos ativos.</h5>
+                {% if pode_criar_novo %}
+                    <p class="text-muted small mb-4">Começa por criar um novo pedido de visto ou residência.</p>
+                    <a href="{% url 'create_process' %}" class="btn btn-primary px-4 shadow-sm">
+                        <i class="bi bi-plus-lg me-2"></i>Criar o meu primeiro pedido
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    {% if processos.has_other_pages %}
+    <div class="card-footer bg-white py-3 border-top">
+        <nav aria-label="Navegação">
+            <ul class="pagination justify-content-center mb-0 pagination-sm">
+                {% if processos.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link border-0 text-secondary" href="?page={{ processos.previous_page_number }}&q={{ request.GET.q }}">
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link border-0 text-muted"><i class="bi bi-chevron-left"></i> Anterior</span></li>
+                {% endif %}
+
+                <li class="page-item active"><span class="page-link bg-primary border-primary">{{ processos.number }}</span></li>
+
+                {% if processos.has_next %}
+                    <li class="page-item">
+                        <a class="page-link border-0 text-secondary" href="?page={{ processos.next_page_number }}&q={{ request.GET.q }}">
+                            Próxima <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link border-0 text-muted">Próxima <i class="bi bi-chevron-right"></i></span></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+</div>
+
+{% for p in processos %}
+    {% if p.appointment %}
+    <div class="modal fade text-start" id="ticketModal{{ p.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-qr-code me-2"></i>Sua Senha Digital</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="display-1 fw-bold text-dark mb-2">{{ p.appointment.ticket_number }}</div>
+                    <p class="lead mb-1 text-primary fw-bold">{{ p.appointment.location }}</p>
+                    <p class="text-muted border-bottom pb-3">
+                        <i class="bi bi-clock me-1"></i> {{ p.appointment.appointment_date|date:"d F Y, H:i" }}
+                    </p>
+                    <div class="d-grid mt-3">
+                        <a href="{% url 'generate_pdf' p.appointment.id %}" class="btn btn-danger btn-lg">
+                            <i class="bi bi-file-earmark-pdf me-2"></i> Descarregar PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
+
+{% endblock %}

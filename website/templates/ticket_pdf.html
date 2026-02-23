@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Comprovativo de Agendamento</title>
+    <style>
+        /* CONFIGURAÇÃO DA PÁGINA A4 */
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+        body {
+            font-family: Helvetica, sans-serif;
+            color: #333;
+            line-height: 1.4;
+            font-size: 11pt;
+        }
+
+        /* CABEÇALHO */
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #003366;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        /* CAIXA DE DESTAQUE (SENHA) */
+        .ticket-box {
+            border: 2px solid #003366;
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            border-radius: 10px;
+        }
+        .ticket-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #555;
+            letter-spacing: 1px;
+        }
+        .ticket-number {
+            font-size: 45px;
+            font-weight: bold;
+            color: #003366;
+            margin: 10px 0;
+            display: block;
+        }
+        .ticket-location {
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            border-top: 1px dotted #ccc;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        /* TABELA DE DADOS */
+        .info-section {
+            width: 100%;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            color: #555;
+            width: 35%;
+            font-size: 10px;
+            text-transform: uppercase;
+            vertical-align: middle;
+        }
+        td {
+            text-align: right;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+            color: #000;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        /* RODAPÉ */
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 9px;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .warning {
+            color: #dc3545;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">IMIGRAÁGIL</div>
+        <div class="subtitle">Comprovativo Oficial de Agendamento</div>
+    </div>
+
+    <div class="ticket-box">
+        <div class="ticket-label">A sua senha de atendimento</div>
+        <div class="ticket-number">{{ appointment.ticket_number }}</div>
+        <div class="ticket-location">
+            LOCAL: {{ appointment.location }}
+        </div>
+    </div>
+
+    <div class="info-section">
+        <table>
+            <tr>
+                <th>Titular do Processo</th>
+                <td>{{ appointment.process.user.first_name }} {{ appointment.process.user.last_name }}</td>
+            </tr>
+            <tr>
+                <th>Documento de Identificação</th>
+                <td>Passaporte nº {{ appointment.process.user.profile.passport }}</td>
+            </tr>
+            <tr>
+                <th>Tipo de Serviço</th>
+                <td>{{ appointment.process.service_type.name }}</td>
+            </tr>
+            <tr>
+                <th>Data e Hora Marcada</th>
+                <td>{{ appointment.appointment_date|date:"d \d\e F \d\e Y" }} às {{ appointment.appointment_date|date:"H:i" }}</td>
+            </tr>
+            <tr>
+                <th>Referência Interna</th>
+                <td>PT/{{ appointment.process.submission_date|date:"Y" }}/{{ appointment.process.id|stringformat:"04d" }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        <p class="warning">⚠ IMPORTANTE: Compareça 15 minutos antes da hora marcada.</p>
+        <p>É obrigatória a apresentação deste comprovativo (impresso ou digital) e do <strong>Passaporte original</strong>.</p>
+        <br>
+        <p>Documento processado automaticamente pelo sistema ImigraÁgil em {% now "d/m/Y H:i" %}.</p>
+        <p>Este documento não serve como título de residência.</p>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Ambientes Virtuais
+.venv/
+venv/
+env/
+
+# Base de Dados (Nunca enviar para o GitHub por segurança)
+db.sqlite3
+
+# Ficheiros de Upload dos Utilizadores
+media/
+
+# Ficheiros temporários do Python e Django
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Ficheiros do VS Code e Sistema Operativo
+.vscode/
+.DS_Store
+Thumbs.db

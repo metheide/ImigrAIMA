@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar Conta Nova{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5 mb-5">
+    <div class="col-md-7 col-lg-5">
+        
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-5">
+                
+                <div class="text-center mb-4">
+                    <div class="mb-3 text-primary bg-primary bg-opacity-10 d-inline-block p-3 rounded-circle">
+                        <i class="bi bi-person-plus-fill" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h3 class="fw-bold">Criar Conta</h3>
+                    <p class="text-muted small">Preencha os dados para se juntar ao ImigraÁgil.</p>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger small shadow-sm fade show">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-bold small text-secondary">
+                                {{ field.label }}
+                            </label>
+                            
+                            {{ field }}
+                            
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in field.errors %}
+                                        <i class="bi bi-exclamation-circle-fill"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            {% if field.help_text %}
+                                <div class="form-text text-muted small opacity-75 mt-1" style="font-size: 0.8rem;">
+                                    {{ field.help_text|safe }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="d-grid mt-4 mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm rounded-pill">
+                            <i class="bi bi-check-lg me-1"></i> Confirmar Registo
+                        </button>
+                    </div>
+                </form>
+
+                <hr class="my-4 text-muted opacity-25">
+
+                <div class="text-center">
+                    <p class="text-muted mb-1 small">Já tem uma conta?</p>
+                    <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-4 fw-bold">
+                        Fazer Login
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="text-center mt-3 text-muted opacity-50 small">
+            <i class="bi bi-shield-lock"></i> Os seus dados estão protegidos.
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* Pequeno ajuste CSS para as listas de ajuda de password do Django ficarem bonitas */
+    .form-text ul {
+        padding-left: 20px;
+        margin-bottom: 0;
+    }
+    .form-text li {
+        list-style-type: disc;
+    }
+</style>
+
+{% endblock %}

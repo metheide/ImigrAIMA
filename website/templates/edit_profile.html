@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4 text-primary fw-bold">
+        <i class="bi bi-person-circle"></i> O Meu Perfil
+    </h2>
+
+    <form method="POST" class="row g-4">
+        {% csrf_token %}
+
+        <div class="col-md-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Dados de Conta</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Nome de Utilizador</label>
+                        <input type="text" class="form-control" value="{{ user.username }}" disabled>
+                        <small class="text-muted">O username não pode ser alterado.</small>
+                    </div>
+                    
+                    {% for field in u_form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger small">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white text-primary border-primary">
+                    <h5 class="mb-0"><i class="bi bi-passport"></i> Dados de Imigração</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info py-2 small">
+                        <i class="bi bi-info-circle"></i> Estes dados serão usados automaticamente nos teus pedidos.
+                    </div>
+
+                    {% for field in p_form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger small">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 text-end mt-4">
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary me-2">Cancelar</a>
+            <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="bi bi-save"></i> Guardar Alterações
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

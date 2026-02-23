@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    
+    {% if process.status == 'draft' %}
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-10 col-lg-8">
+            <div class="position-relative m-4">
+                
+                <div class="progress" style="height: 2px; position: absolute; top: 50%; width: 100%; transform: translateY(-50%); z-index: 0;">
+                    <div class="progress-bar" role="progressbar" style="width: 50%;"></div>
+                </div>
+
+                <div class="position-absolute top-50 start-0 translate-middle text-center" style="z-index: 1; min-width: 120px;">
+                    <button type="button" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 2.5rem; height: 2.5rem; border: 4px solid #fff;">
+                        <i class="bi bi-check-lg"></i> </button>
+                    <div class="text-primary fw-bold small mt-2 text-uppercase">Visto</div>
+                </div>
+
+                <div class="position-absolute top-50 start-50 translate-middle text-center" style="z-index: 1; min-width: 120px;">
+                    <button type="button" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 2.5rem; height: 2.5rem; border: 4px solid #fff;">
+                        2
+                    </button>
+                    <div class="text-primary fw-bold small mt-2 text-uppercase">Documentos</div>
+                </div>
+
+                <div class="position-absolute top-50 start-100 translate-middle text-center" style="z-index: 1; min-width: 120px;">
+                    <button type="button" class="btn btn-secondary rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 2.5rem; height: 2.5rem; border: 4px solid #fff;">
+                        3
+                    </button>
+                    <div class="text-muted small mt-2 text-uppercase">Submissão</div>
+                </div>
+
+            </div>
+            <div style="height: 40px;"></div>
+        </div>
+    </div>
+    {% else %}
+        <a href="{% url 'dashboard' %}" class="text-decoration-none text-muted mb-4 d-inline-block">
+            <i class="bi bi-arrow-left"></i> Voltar ao Dashboard
+        </a>
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <span class="badge bg-primary mb-2">Processo #{{ process.id }}</span>
+            <h2 class="fw-bold">{{ process.service_type.name }}</h2>
+            <p class="text-muted">Criado em: {{ process.submission_date|date:"d/m/Y H:i" }}</p>
+        </div>
+        
+        <div class="text-end">
+            {% if process.status == 'draft' %}
+                <a href="{% url 'cancel_process' process.id %}" class="btn btn-outline-danger btn-sm mb-2" onclick="return confirm('Tens a certeza? Isto apaga tudo.');">
+                    <i class="bi bi-trash"></i> Cancelar Pedido
+                </a>
+            {% endif %}
+            
+            <div class="mt-2">
+                Status Atual: 
+                {% if process.status == 'approved' %}
+                    <span class="badge bg-success fs-6">Aprovado</span>
+                {% elif process.status == 'submitted' %}
+                    <span class="badge bg-primary fs-6">Submetido</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark fs-6">Em Análise</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-paperclip"></i> Documentos Necessários</h5>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for item in documents_status %}
+            <div class="list-group-item p-4">
+                <div class="row align-items-center">
+                    
+                    <div class="col-md-5">
+                        <h6 class="mb-1 fw-bold">
+                            {{ item.doc_type.doc_name }}
+                            {% if item.doc_type.is_mandatory %}
+                                <span class="text-danger">*</span>
+                            {% endif %}
+                        </h6>
+                        {% if item.attachment.status == 'invalid' %}
+                             <div class="text-danger small mt-1">
+                                <i class="bi bi-exclamation-circle"></i> Motivo da rejeição: {{ item.attachment.admin_feedback }}
+                             </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3 text-center">
+                        {% if item.attachment %}
+                            <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill">
+                                <i class="bi bi-check-lg"></i> Carregado
+                            </span>
+                            <div class="mt-2">
+                                <small class="text-muted">{{ item.attachment.uploaded_at|date:"d/m/Y" }}</small>
+                            </div>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary px-3 py-2 rounded-pill">
+                                <i class="bi bi-hourglass"></i> Pendente
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-4 text-end">
+                        {% if process.status == 'draft' %}
+                            {% if item.attachment %}
+                                <a href="{{ item.attachment.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary" title="Ver Documento">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'delete_document' item.attachment.id %}" class="btn btn-sm btn-outline-danger" title="Remover">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            {% else %}
+                                <form action="{% url 'upload_document' process.id %}" method="POST" enctype="multipart/form-data" class="d-flex gap-2 justify-content-end">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="doc_type_id" value="{{ item.doc_type.id }}">
+                                    <input type="file" name="file" class="form-control form-control-sm w-auto" required>
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-upload"></i> Enviar
+                                    </button>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            {% if item.attachment %}
+                                <a href="{{ item.attachment.file.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye"></i> Ver Documento
+                                </a>
+                            {% else %}
+                                <span class="text-muted small">Não entregue</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if process.status == 'draft' %}
+    <div class="card bg-light border-0 p-4 text-center mt-4">
+        <h5 class="fw-bold mb-3">Passo Final: Submissão</h5>
+        <p class="text-muted mb-4">Verifica se carregaste todos os documentos obrigatórios antes de enviar.</p>
+        
+        <a href="{% url 'submit_process_final' process.id %}" class="btn btn-success btn-lg px-5 py-3 shadow">
+            <i class="bi bi-send-check-fill"></i> Submeter Pedido para Análise
+        </a>
+    </div>
+    {% endif %}
+
+    {% if process.status == 'approved' %}
+    <div class="alert alert-success text-center p-5 shadow-sm mt-4">
+        <h1 class="display-4 text-success mb-3"><i class="bi bi-check-circle-fill"></i></h1>
+        <h3 class="fw-bold">Parabéns! O teu pedido foi aprovado.</h3>
+        <p class="lead">Já podes agendar a tua deslocação à AIMA.</p>
+        
+        {% if process.appointment %}
+             <a href="{% url 'generate_pdf' process.appointment.id %}" class="btn btn-dark btn-lg mt-3">
+                <i class="bi bi-file-pdf"></i> Baixar Senha (PDF)
+            </a>
+        {% else %}
+            <a href="{% url 'generate_appointment' process.id %}" class="btn btn-success btn-lg mt-3">
+                <i class="bi bi-calendar-check"></i> Agendar Agora
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
