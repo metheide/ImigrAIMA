@@ -1,6 +1,6 @@
-# 🌍 ImigraÁgil - Gestão AIMA Simplificada
+# ImigrAIMA - Gestão AIMA Simplificada
 
-**ImigraÁgil** é um portal web desenvolvido em Django para simplificar e digitalizar o processo de renovação de autorizações de residência e agendamentos com a AIMA (Agência para a Integração, Migrações e Asilo).
+**ImigrAIMA** é um portal web desenvolvido em Django para simplificar e digitalizar o processo de renovação de autorizações de residência e agendamentos com a AIMA (Agência para a Integração, Migrações e Asilo).
 
 ## Funcionalidades Principais
 

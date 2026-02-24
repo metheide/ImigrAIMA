@@ -119,15 +119,13 @@ a:hover {
 .timeline-step.rejected .step-label { color: #dc3545; }
 
 /* =========================================
-   5. REGRAS SUPREMAS DE VISIBILIDADE (LEIA-SE: FORÇAR BRANCO)
+   5. REGRAS DE VISIBILIDADE (LEIA-SE: FORÇAR BRANCO)
    ========================================= */
-/* Estas regras estão no fim para "ganhar" sobre todas as outras */
-
 /* Configuração Base dos Botões e Badges */
 .btn { border-radius: 8px; padding: 8px 20px; font-weight: 600; transition: all 0.2s; }
 .badge { padding: 0.6em 1em; font-weight: 600; border-radius: 6px; }
 
-/* A REGRA NUCLEAR: Se tem fundo azul, TUDO lá dentro é branco */
+/* Se tem fundo azul, TUDO lá dentro é branco */
 .bg-primary, 
 .btn-primary, 
 .badge.bg-primary,
@@ -158,8 +156,6 @@ a.btn-primary:hover,
 /* =========================================
    RESTAURAÇÃO DAS CORES DE ESTADO
    ========================================= */
-/* Estas regras têm de ficar no FIM para ganhar à regra do Azul */
-
 /* 1. VERDE (Aprovado / Sucesso) */
 .bg-success, 
 .btn-success, 

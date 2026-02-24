@@ -65,7 +65,7 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user) # Login automático
-            messages.success(request, '🎉 Conta criada com sucesso! Bem-vindo.')
+            messages.success(request, 'Conta criada com sucesso! Bem-vindo.')
             return redirect('dashboard')
     else:
         form = CustomUserCreationForm()
@@ -120,7 +120,7 @@ def edit_profile(request):
         if u_form.is_valid() and p_form.is_valid():
             u_form.save()
             p_form.save()
-            messages.success(request, '✅ O teu perfil foi atualizado com sucesso!')
+            messages.success(request, 'O teu perfil foi atualizado com sucesso!')
             return redirect('dashboard')
     else:
         u_form = UserUpdateForm(instance=request.user)
@@ -199,7 +199,7 @@ def upload_document(request, process_id):
     process = get_object_or_404(Process, id=process_id, user=request.user)
     
     if process.status != 'draft':
-        messages.error(request, '⛔ Este processo já foi submetido. Não podes alterar documentos.')
+        messages.error(request, 'Este processo já foi submetido. Não podes alterar documentos.')
         return redirect('process_detail', process_id=process.id)
 
     if request.method == 'POST':
@@ -218,9 +218,9 @@ def upload_document(request, process_id):
                 required_doc=doc_type,
                 file=file
             )
-            messages.success(request, '📄 Documento carregado com sucesso!')
+            messages.success(request, 'Documento carregado com sucesso!')
         else:
-            messages.error(request, '❌ Erro ao carregar documento.')
+            messages.error(request, 'Erro ao carregar documento.')
             
     return redirect('process_detail', process_id=process_id)
 
@@ -233,16 +233,16 @@ def delete_document(request, doc_id):
     
     # SEGURANÇA: Garante que o documento pertence ao utilizador logado
     if attachment.process.user != request.user:
-        messages.error(request, '⛔ Acesso negado.')
+        messages.error(request, 'Acesso negado.')
         return redirect('dashboard')
 
     if attachment.process.status == 'draft':
         process_id = attachment.process.id
         attachment.delete()
-        messages.success(request, '🗑️ Documento removido.')
+        messages.success(request, 'Documento removido.')
         return redirect('process_detail', process_id=process_id)
     else:
-        messages.error(request, '⛔ Não pode remover documentos de um processo submetido.')
+        messages.error(request, 'Não pode remover documentos de um processo submetido.')
         return redirect('dashboard')
 
 @login_required
@@ -258,13 +258,13 @@ def submit_process_final(request, process_id):
         uploaded_count = Attachment.objects.filter(process=process, required_doc__is_mandatory=True).count()
 
         if uploaded_count < required_count:
-            messages.error(request, '⚠️ Faltam documentos obrigatórios! Por favor carregue todos antes de submeter.')
+            messages.error(request, 'Faltam documentos obrigatórios! Por favor carregue todos antes de submeter.')
             return redirect('process_detail', process_id=process.id)
 
         process.status = 'submitted'
         process.submission_date = timezone.now() # Regista a data real do envio
         process.save()
-        messages.success(request, '🎉 Processo submetido com sucesso! Aguarde a análise da AIMA.')
+        messages.success(request, 'Processo submetido com sucesso! Aguarde a análise da AIMA.')
     
     return redirect('dashboard')
 
@@ -277,9 +277,9 @@ def cancel_process(request, process_id):
     
     if process.status == 'draft':
         process.delete()
-        messages.success(request, '🗑️ O pedido foi cancelado e removido com sucesso.')
+        messages.success(request, 'O pedido foi cancelado e removido com sucesso.')
     else:
-        messages.error(request, '⛔ Não é possível cancelar um processo que já foi submetido.')
+        messages.error(request, 'Não é possível cancelar um processo que já foi submetido.')
     
     return redirect('dashboard')
 
@@ -295,12 +295,12 @@ def generate_appointment(request, process_id):
     process = get_object_or_404(Process, id=process_id, user=request.user)
     
     if process.status != 'approved':
-        messages.error(request, '❌ Este processo ainda não foi aprovado.')
+        messages.error(request, 'Este processo ainda não foi aprovado.')
         return redirect('dashboard')
     
     # Verifica se já existe agendamento (evita duplicados)
     if hasattr(process, 'appointment'):
-        messages.warning(request, '⚠️ Já tens um agendamento para este processo.')
+        messages.warning(request, 'Já tens um agendamento para este processo.')
         return redirect('dashboard')
 
     # Lógica de Agendamento (Simulação)
@@ -314,7 +314,7 @@ def generate_appointment(request, process_id):
         location="Loja AIMA Lisboa - Campus de Justiça"
     )
     
-    messages.success(request, f'📅 Agendamento confirmado! Senha: {nova_senha}.')
+    messages.success(request, f'Agendamento confirmado! Senha: {nova_senha}.')
     return redirect('dashboard')
 
 @login_required

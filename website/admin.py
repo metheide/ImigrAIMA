@@ -11,11 +11,9 @@ class ServiceTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'estimated_wait_time')
     inlines = [RequiredDocInline]
 
-# 2. Configuração do Perfil (AQUI ESTAVA O ERRO)
+# 2. Configuração do Perfil
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    # Removemos 'full_name' e 'passport_number'
-    # Adicionamos 'passport' (o novo nome) e 'nif'
     list_display = ('user', 'passport', 'nif', 'phone', 'nationality')
     search_fields = ('user__username', 'user__first_name', 'passport', 'nif')
 

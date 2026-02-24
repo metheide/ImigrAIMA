@@ -53,7 +53,7 @@ class CustomUserCreationForm(UserCreationForm):
 
 class UserUpdateForm(forms.ModelForm):
     """
-    Permite alterar nome e email (mas não a password ou username aqui).
+    Permite alterar nome e email.
     """
     email = forms.EmailField(required=True)
 
@@ -74,11 +74,9 @@ class UserUpdateForm(forms.ModelForm):
 class ProfileUpdateForm(forms.ModelForm):
     """
     Formulário para os dados específicos de imigração.
-    Agora inclui 'nationality' que estava em falta.
     """
     class Meta:
         model = Profile
-        # Campos alinhados com o novo models.py
         fields = ['passport', 'nif', 'nationality', 'phone', 'address']
         
         labels = {

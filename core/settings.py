@@ -1,6 +1,6 @@
 """
 Django settings for core project.
-ImigraÁgil - Sistema de Gestão de Imigração
+ImigrAIMA - Sistema de Gestão de Imigração
 """
 
 from pathlib import Path

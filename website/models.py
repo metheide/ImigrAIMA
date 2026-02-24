@@ -46,7 +46,6 @@ class RequiredDoc(models.Model):
 class Profile(models.Model):
     """
     Estende o utilizador padrão do Django para guardar dados extra de imigração.
-    Nota: Removemos 'full_name' (usamos user.first_name) e duplicados de passaporte.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     
