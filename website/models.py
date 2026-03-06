@@ -1,5 +1,29 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError # 🔒 NOVO IMPORT PARA VALIDAÇÃO
+import os # 🔒 NOVO IMPORT PARA LER EXTENSÕES DE FICHEIROS
+
+# ==========================================
+# FUNÇÕES DE SEGURANÇA (VALIDADORES)
+# ==========================================
+
+def validate_file_extension_and_size(value):
+    """
+    🔒 MEDIDA DE SEGURANÇA: Previne upload de Malware e ficheiros gigantes.
+    Verifica a extensão do ficheiro e o tamanho antes de o guardar no servidor.
+    """
+    # 1. Validar a extensão (Apenas PDFs e Imagens)
+    ext = os.path.splitext(value.name)[1].lower()
+    valid_extensions = ['.pdf', '.jpg', '.jpeg', '.png']
+    if ext not in valid_extensions:
+        raise ValidationError('Ficheiro não suportado. Por segurança, envie apenas PDF, JPG ou PNG.')
+    
+    # 2. Validar o tamanho (Limite de 5MB)
+    # 5MB = 5 * 1024 * 1024 bytes
+    limit_mb = 5
+    limit_bytes = limit_mb * 1024 * 1024
+    if value.size > limit_bytes:
+        raise ValidationError(f'O ficheiro é muito grande. O tamanho máximo permitido é {limit_mb}MB.')
 
 # ==========================================
 # 1. CONFIGURAÇÕES DO SISTEMA (Geridas pelo Admin)
@@ -109,8 +133,12 @@ class Attachment(models.Model):
     process = models.ForeignKey(Process, on_delete=models.CASCADE, related_name='attachments')
     required_doc = models.ForeignKey(RequiredDoc, on_delete=models.PROTECT, verbose_name="Requisito")
     
-    # Upload organizado por ano/mês para não encher uma pasta só
-    file = models.FileField(upload_to='documents/%Y/%m/', verbose_name="Ficheiro")
+    # 🔒 SEGURANÇA: Validador adicionado ao campo file
+    file = models.FileField(
+        upload_to='documents/%Y/%m/', 
+        verbose_name="Ficheiro",
+        validators=[validate_file_extension_and_size] # Aplica a função de segurança criada acima
+    )
     
     uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name="Data de Envio")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')

@@ -12,6 +12,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template.loader import get_template
 from django.db.models import Count, Q
 from django.core.paginator import Paginator # Importado no topo para organização
+from django.core.exceptions import PermissionDenied # 🔒 NOVO IMPORT PARA SEGURANÇA IDOR
 
 # --- Imports Externos ---
 import random
@@ -168,7 +169,12 @@ def process_detail(request, process_id):
     """
     Página principal do processo.
     """
-    process = get_object_or_404(Process, id=process_id, user=request.user)
+    # Busca o processo
+    process = get_object_or_404(Process, id=process_id)
+    
+    # 🔒 MEDIDA DE SEGURANÇA (IDOR): Garante que o processo é do utilizador logado OU que é um membro Staff (AIMA)
+    if process.user != request.user and not request.user.is_staff:
+        raise PermissionDenied("Acesso Negado: Não tem permissão para visualizar este processo.")
     
     # 1. Quais documentos este tipo de visto exige?
     required_docs = RequiredDoc.objects.filter(service_type=process.service_type)
@@ -196,7 +202,11 @@ def upload_document(request, process_id):
     """
     Upload de ficheiros para o processo.
     """
-    process = get_object_or_404(Process, id=process_id, user=request.user)
+    process = get_object_or_404(Process, id=process_id)
+    
+    # 🔒 MEDIDA DE SEGURANÇA (IDOR)
+    if process.user != request.user and not request.user.is_staff:
+        raise PermissionDenied("Acesso Negado: Não tem permissão para alterar este processo.")
     
     if process.status != 'draft':
         messages.error(request, 'Este processo já foi submetido. Não podes alterar documentos.')
@@ -231,10 +241,9 @@ def delete_document(request, doc_id):
     """
     attachment = get_object_or_404(Attachment, id=doc_id)
     
-    # SEGURANÇA: Garante que o documento pertence ao utilizador logado
-    if attachment.process.user != request.user:
-        messages.error(request, 'Acesso negado.')
-        return redirect('dashboard')
+    # 🔒 SEGURANÇA (IDOR): Garante que o documento pertence ao utilizador logado ou a um Staff
+    if attachment.process.user != request.user and not request.user.is_staff:
+        raise PermissionDenied("Acesso Negado: Não tem permissão para remover este documento.")
 
     if attachment.process.status == 'draft':
         process_id = attachment.process.id
@@ -250,7 +259,11 @@ def submit_process_final(request, process_id):
     """
     AÇÃO FINAL: Transforma o Rascunho em Processo Submetido.
     """
-    process = get_object_or_404(Process, id=process_id, user=request.user)
+    process = get_object_or_404(Process, id=process_id)
+    
+    # 🔒 MEDIDA DE SEGURANÇA (IDOR)
+    if process.user != request.user and not request.user.is_staff:
+        raise PermissionDenied("Acesso Negado: Não tem permissão para submeter este processo.")
     
     if process.status == 'draft':
         # Validação: Verifica se TODOS os documentos obrigatórios foram enviados
@@ -273,7 +286,11 @@ def cancel_process(request, process_id):
     """
     Cancela e apaga um processo em Rascunho.
     """
-    process = get_object_or_404(Process, id=process_id, user=request.user)
+    process = get_object_or_404(Process, id=process_id)
+    
+    # 🔒 MEDIDA DE SEGURANÇA (IDOR)
+    if process.user != request.user and not request.user.is_staff:
+        raise PermissionDenied("Acesso Negado: Não tem permissão para cancelar este processo.")
     
     if process.status == 'draft':
         process.delete()
@@ -292,7 +309,11 @@ def generate_appointment(request, process_id):
     """
     Gera um agendamento automático para processos Aprovados.
     """
-    process = get_object_or_404(Process, id=process_id, user=request.user)
+    process = get_object_or_404(Process, id=process_id)
+    
+    # 🔒 MEDIDA DE SEGURANÇA (IDOR)
+    if process.user != request.user and not request.user.is_staff:
+        raise PermissionDenied("Acesso Negado: Não tem permissão para efetuar este agendamento.")
     
     if process.status != 'approved':
         messages.error(request, 'Este processo ainda não foi aprovado.')
@@ -322,9 +343,11 @@ def generate_pdf(request, appointment_id):
     """
     Gera um ficheiro PDF oficial com os dados do agendamento.
     """
-    # Busca o agendamento através do ID, mas garante que o processo associado é do user logado
-    # Isto previne que alguém tente sacar PDFs de outras pessoas mudando o ID na URL
-    appointment = get_object_or_404(Appointment, id=appointment_id, process__user=request.user)
+    appointment = get_object_or_404(Appointment, id=appointment_id)
+    
+    # 🔒 MEDIDA DE SEGURANÇA (IDOR): Verifica no processo associado ao agendamento
+    if appointment.process.user != request.user and not request.user.is_staff:
+         raise PermissionDenied("Acesso Negado: Esta senha não lhe pertence.")
     
     template_path = 'ticket_pdf.html'
     context = {'appointment': appointment}

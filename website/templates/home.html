@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
-
-{% block title %}Bem-vindo ao Portal{% endblock %}
+{% load static %} {% block title %}Bem-vindo ao Portal{% endblock %}
 
 {% block content %}
 
@@ -41,8 +40,13 @@
     
     <div class="col-lg-6 order-1 order-lg-2 text-center mb-5 mb-lg-0">
         <div class="position-relative d-inline-block">
-            <div class="position-absolute top-50 start-50 translate-middle bg-primary bg-opacity-10 rounded-circle" style="width: 300px; height: 300px; z-index: -1;"></div>
-            <i class="bi bi-passport text-primary" style="font-size: 12rem; opacity: 0.9;"></i>
+            <div class="position-absolute top-50 start-50 translate-middle bg-primary bg-opacity-10 rounded-circle" style="width: 350px; height: 350px; z-index: -1;"></div>
+            
+            <img src="{% static 'img/cartao_cidadao.jpg' %}" 
+                 alt="Cartão de Residência Português" 
+                 class="img-fluid rounded-4 shadow-lg border border-3 border-white" 
+                 style="max-height: 400px; object-fit: cover;">
+                 
         </div>
     </div>
 </div>
@@ -67,7 +71,8 @@
         <div class="col">
             <div class="card h-100 border-0 shadow-sm bg-light text-center p-4">
                 <div class="icon-square bg-white text-primary d-inline-flex align-items-center justify-content-center fs-2 rounded-circle shadow-sm mb-3 mx-auto" style="width: 70px; height: 70px;">
-                    <i class="bi bi-search"></i> </div>
+                    <i class="bi bi-search"></i> 
+                </div>
                 <h4 class="fw-bold">Análise Transparente</h4>
                 <p class="text-muted">Acompanhe cada etapa. Receba notificações quando o seu processo for analisado pelos nossos técnicos.</p>
             </div>
